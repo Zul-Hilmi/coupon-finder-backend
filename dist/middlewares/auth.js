@@ -20,12 +20,10 @@ const couponModel_1 = require("../api/models/couponModel");
 const clientError_1 = __importDefault(require("../config/clientError"));
 //create user session and store them in the cookie
 const authenticate = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // const cookie =  req.headers.cookies??req.cookies.token
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        console.log(decoded);
         req.user = yield userModel_1.User.findById(decoded.id).select('-password')
             .orFail(() => { throw new clientError_1.default(400, "Not authorized"); });
     }

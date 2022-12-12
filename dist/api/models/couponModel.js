@@ -7,13 +7,27 @@ const couponSchema = new mongoose_1.Schema({
     discount: {
         type: String,
         trim: true,
-        minLength: [3, "Invalid discount given"],
+        minLength: [3, "Discount cant be less than 3 character"],
         required: [true, "Discount is required"],
+    },
+    offer: {
+        type: String,
+        trim: true,
+        minlength: [3, "Offer cant be less than 3 character"],
+        required: [true, "Offer is required"]
     },
     expiry: {
         type: String,
         trim: true,
-        default: null,
+        validate: {
+            validator: function (date) {
+                if (!date)
+                    return "No expiry date";
+                return new RegExp(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/).test(date);
+            },
+            message: props => `${props.value} is not a valid Date`
+        },
+        default: "No expiry date",
     },
     code: {
         type: String,
@@ -23,17 +37,28 @@ const couponSchema = new mongoose_1.Schema({
     link: {
         type: String,
         trim: true,
+        validate: {
+            validator: function (url) {
+                if (!url)
+                    return "No link for this coupon";
+                return new URL(url);
+            }
+        },
         default: "No link for this coupon"
     },
     description: {
         type: String,
-        minlength: [6, "Description can't be less than 6 characters "],
-        default: "No description for this coupon"
+        minlength: [6, "Description can't be less than 6 characters "]
     },
     owner: {
         type: mongoose_1.Schema.Types.ObjectId,
         required: [true, "Coupon have to be owned by an owner"],
         ref: 'User'
+    },
+    store_name: {
+        type: String,
+        allowNull: true,
+        default: null
     }
 }, {
     timestamps: true

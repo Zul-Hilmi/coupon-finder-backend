@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatDescription = exports.formatDate = exports.formatDiscount = exports.getOption = void 0;
+const striptags_1 = __importDefault(require("striptags"));
 const getOption = (discount) => {
     var options = {
         'method': 'POST',
@@ -32,6 +36,7 @@ exports.getOption = getOption;
 //format the scrapped text element for making the request to the scrapping website
 const formatDiscount = (discount) => {
     let formatDis = discount.toLowerCase();
+    formatDis = formatDis.replaceAll(" & ", " and ");
     formatDis = formatDis.replaceAll("%", "percent");
     formatDis = formatDis.replaceAll("+", "%2B");
     formatDis = formatDis.trim();
@@ -41,12 +46,13 @@ const formatDiscount = (discount) => {
 exports.formatDiscount = formatDiscount;
 //format the scrapped expiry date for making the request to the scrapping website
 const formatDate = (date) => {
+    if (!date)
+        return null;
     const d = new Date(+date);
     let curr_date = d.getDate();
     let curr_month = d.getMonth() + 1; //Months are zero based
     let curr_year = d.getFullYear();
     let fullDate = (curr_date + "-" + curr_month + "-" + curr_year);
-    console.log(fullDate);
     if (curr_year < 2005) {
         return null;
     }
@@ -54,11 +60,12 @@ const formatDate = (date) => {
 };
 exports.formatDate = formatDate;
 const formatDescription = (description) => {
+    if (!description)
+        return null;
     let formdesc = description;
-    formdesc = formdesc.replaceAll("<li>", "");
-    formdesc = formdesc.replaceAll("</li>", "");
-    formdesc = formdesc.replaceAll("<ul>", "");
-    formdesc = formdesc.replaceAll("</ul>", "");
+    formdesc = formdesc.replaceAll("<br>", "&#13");
+    formdesc = formdesc.replaceAll("</li>", "&#13");
+    formdesc = (0, striptags_1.default)(formdesc);
     return formdesc;
 };
 exports.formatDescription = formatDescription;

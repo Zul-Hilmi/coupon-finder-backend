@@ -59,10 +59,6 @@ const userSchema = new mongoose_1.Schema({
     active: {
         type: Boolean,
         default: false
-    },
-    token: {
-        type: String,
-        default: null
     }
 });
 userSchema.pre('save', function (next) {

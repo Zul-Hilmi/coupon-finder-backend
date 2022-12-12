@@ -39,9 +39,8 @@ const email = (0, express_async_handler_1.default)((req, res) => __awaiter(void 
         userId = _id;
     }
     const emailToken = jsonwebtoken_1.default.sign({ userId }, process.env.EMAIL_SECRET, { expiresIn: "3d" });
-    const sent = (0, mail_1.default)(emailToken, user.email, `${req.protocol}://${req.headers.host}`).valueOf();
-    if (sent == false)
-        throw new clientError_1.default(502, "Something went wrong when sending email,please try again later");
+    const sent = yield (0, mail_1.default)(emailToken, user.email, `${req.protocol}://${req.headers.host}`)
+        .catch(err => { throw new clientError_1.default(502, "Something went wrong when sending email,please try again later"); });
     res.status(200).json({ message: "Check your email for verification link" });
 }));
 exports.email = email;
@@ -71,9 +70,7 @@ const login = (0, express_async_handler_1.default)((req, res) => __awaiter(void 
         throw new clientError_1.default(401, "Invalid Credential");
     if (user.active === false)
         throw new clientError_1.default(401, "Please activate this account first");
-    const token = jsonwebtoken_1.default.sign({ user }, "ABC123", { expiresIn: "30d" });
-    // res.cookie("token", token, {httpOnly: true,});
-    res.json({ message: "Logged in successfully", token: generateToken(user._id) });
+    res.json({ message: "Logged in successfully", token: generateToken(user._id), id: user._id });
 }));
 exports.login = login;
 const logout = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -83,7 +80,7 @@ const logout = (0, express_async_handler_1.default)((req, res) => __awaiter(void
 exports.logout = logout;
 // the owner of the account have been confirmed before the detail,update and remove middlewares  
 const detail = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield userModel_1.User.findById(req.params.id).select({ "_id": 1, "name": 1, "email": 1, "password": 1 })
+    const user = yield userModel_1.User.findById(req.params.id).select("-active")
         .orFail(() => { throw new clientError_1.default(404, "User does not exist"); });
     res.status(200).json({ message: user });
 }));

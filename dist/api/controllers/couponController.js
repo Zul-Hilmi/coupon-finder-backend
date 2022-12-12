@@ -23,7 +23,6 @@ const clientError_1 = __importDefault(require("../../config/clientError"));
 const create = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user.role == "shopper")
         throw new clientError_1.default(403);
-    console.log("lepa");
     const coupon = req.body;
     coupon.owner = req.user._id;
     yield new couponModel_1.Coupon(coupon).save();
@@ -42,12 +41,12 @@ const list = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0
     //Shopper can see all coupon
     let coupons;
     if (req.user && req.user.role.toLowerCase() === "owner") {
-        coupons = yield couponModel_1.Coupon.find({ owner: req.user._id });
+        coupons = yield couponModel_1.Coupon.find({ owner: req.user._id }).populate('owner');
     }
     else {
         coupons = yield couponModel_1.Coupon.find().populate('owner');
     }
-    res.status(200).json({ messsage: coupons });
+    res.status(200).json({ message: { coupons } });
 }));
 exports.list = list;
 const detail = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -63,9 +62,10 @@ const update = (0, express_async_handler_1.default)((req, res) => __awaiter(void
         id: req.params.id,
         owner: req.user._id
     }).orFail(() => { throw new clientError_1.default(403); });
-    const { discount, expiry, code, link, description } = req.body;
+    const { discount, offer, expiry, code, link, description } = req.body;
     coupon.discount = discount !== null && discount !== void 0 ? discount : coupon.discount;
     coupon.expiry = expiry;
+    coupon.offer = offer !== null && offer !== void 0 ? offer : coupon.offer;
     coupon.code = code;
     coupon.link = link;
     coupon.description = description;
@@ -133,15 +133,19 @@ const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void
     const discounts = yield page.$$eval(".styles_colMid__3FOth h4", (e) => { return e.map(x => x.textContent); });
     for (const discount of discounts) {
         (0, request_1.default)((0, scrape_1.getOption)(discount), (error, response) => __awaiter(void 0, void 0, void 0, function* () {
+            var _c, _d, _e, _f, _g, _h;
             if (!error && response) {
                 if (response.body) {
                     let result = JSON.parse(response.body);
                     let detail = result.data.getExternalVoucherBySlug;
-                    let expiry = (0, scrape_1.formatDate)(detail.expiry);
-                    let description = (0, scrape_1.formatDescription)(detail.description.en);
-                    let code = detail.code;
-                    let link = detail.outbound_url;
-                    let coupon = new couponModel_1.Coupon({ discount, expiry, code, link, description, owner: adminId });
+                    //coupon detail
+                    let offer = (_c = detail === null || detail === void 0 ? void 0 : detail.offer) !== null && _c !== void 0 ? _c : "No offer";
+                    let expiry = (_d = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _d !== void 0 ? _d : "No expiry date";
+                    let description = (_e = detail === null || detail === void 0 ? void 0 : detail.description.en) !== null && _e !== void 0 ? _e : "No description";
+                    let code = (_f = detail === null || detail === void 0 ? void 0 : detail.code) !== null && _f !== void 0 ? _f : "No code";
+                    let link = (_g = detail === null || detail === void 0 ? void 0 : detail.outbound_url) !== null && _g !== void 0 ? _g : "No link";
+                    let store_name = (_h = detail === null || detail === void 0 ? void 0 : detail.store_name) !== null && _h !== void 0 ? _h : shopName;
+                    let coupon = new couponModel_1.Coupon({ discount, offer, expiry, code, link, description, owner: adminId, store_name });
                     yield coupon.save();
                 }
             }
