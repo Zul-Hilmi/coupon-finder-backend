@@ -40,13 +40,15 @@ const list = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0
     //-owner have FIXED filter where the coupon's onwner is owner's id
     //Shopper can see all coupon
     let coupons;
+    let canEdit = false;
     if (req.user && req.user.role.toLowerCase() === "owner") {
         coupons = yield couponModel_1.Coupon.find({ owner: req.user._id }).populate('owner');
+        canEdit = true;
     }
     else {
         coupons = yield couponModel_1.Coupon.find().populate('owner');
     }
-    res.status(200).json({ message: { coupons } });
+    res.status(200).json({ message: { coupons, canEdit } });
 }));
 exports.list = list;
 const detail = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
