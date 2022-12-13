@@ -23,7 +23,9 @@ const couponSchema = new mongoose_1.Schema({
             validator: function (date) {
                 if (!date)
                     return "No expiry date";
-                return new RegExp(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/).test(date);
+                const isValidFormat = new RegExp(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/).test(date);
+                if (isValidFormat == false)
+                    return "No expiry date";
             },
             message: props => `${props.value} is not a valid Date`
         },
@@ -41,7 +43,12 @@ const couponSchema = new mongoose_1.Schema({
             validator: function (url) {
                 if (!url)
                     return "No link for this coupon";
-                return new URL(url);
+                try {
+                    return new URL(url);
+                }
+                catch (err) {
+                    return "No link for this coupon";
+                }
             }
         },
         default: "No link for this coupon"

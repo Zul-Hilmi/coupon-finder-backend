@@ -40,45 +40,46 @@ const list = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0
     //-owner have FIXED filter where the coupon's onwner is owner's id
     //Shopper can see all coupon
     let coupons;
-    let canEdit = false;
     if (req.user && req.user.role.toLowerCase() === "owner") {
         coupons = yield couponModel_1.Coupon.find({ owner: req.user._id }).populate('owner');
-        canEdit = true;
     }
     else {
         coupons = yield couponModel_1.Coupon.find().populate('owner');
     }
-    res.status(200).json({ message: { coupons, canEdit } });
+    res.status(200).json({ message: { coupons } });
 }));
 exports.list = list;
 const detail = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const coupon = yield couponModel_1.Coupon.findById((_a = req.params) === null || _a === void 0 ? void 0 : _a.id)
+    const coupon = yield couponModel_1.Coupon.findById((_a = req.params) === null || _a === void 0 ? void 0 : _a.id).populate('owner')
         .orFail(() => { throw new clientError_1.default(404, "Coupon doesn't exist"); });
     const ratings = yield ratingModel_1.Rating.find({ coupon: coupon._id });
-    res.status(200).json({ messsage: { coupon, ratings } });
+    const isTheOwner = coupon.owner._id == req.user._id ? true : false;
+    res.status(200).json({ message: { coupon, ratings, isTheOwner } });
 }));
 exports.detail = detail;
 const update = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b, _c, _d, _e, _f, _g;
+    console.log(req.params.id);
     const coupon = yield couponModel_1.Coupon.findOne({
-        id: req.params.id,
-        owner: req.user._id
+        id: req.params.id
     }).orFail(() => { throw new clientError_1.default(403); });
-    const { discount, offer, expiry, code, link, description } = req.body;
-    coupon.discount = discount !== null && discount !== void 0 ? discount : coupon.discount;
-    coupon.expiry = expiry;
-    coupon.offer = offer !== null && offer !== void 0 ? offer : coupon.offer;
-    coupon.code = code;
-    coupon.link = link;
-    coupon.description = description;
+    const updatedCoupon = req.body;
+    console.log(updatedCoupon);
+    coupon.discount = (_b = updatedCoupon.discount) !== null && _b !== void 0 ? _b : coupon.discount;
+    coupon.expiry = (_c = updatedCoupon.expiry) !== null && _c !== void 0 ? _c : coupon.expiry;
+    coupon.offer = (_d = updatedCoupon.offer) !== null && _d !== void 0 ? _d : coupon.offer;
+    coupon.code = (_e = updatedCoupon.code) !== null && _e !== void 0 ? _e : coupon.code;
+    coupon.link = (_f = updatedCoupon.link) !== null && _f !== void 0 ? _f : coupon.link;
+    coupon.description = (_g = updatedCoupon.description) !== null && _g !== void 0 ? _g : coupon.description;
     coupon.save();
+    console.log(coupon);
     res.status(200).json({ message: "Updated succesfully" });
 }));
 exports.update = update;
 const remove = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const coupon = yield couponModel_1.Coupon.deleteOne({
-        id: req.params.id,
-        owner: req.user._id
+        id: req.params.id
     }).orFail(() => { throw new clientError_1.default(404, "Coupon doesn't exist"); });
     const ratings = yield ratingModel_1.Rating.deleteMany({ coupon: req.params.id });
     res.status(200).json({ message: "Coupon deleted successfully" });
@@ -121,11 +122,11 @@ exports.deleteRating = deleteRating;
 //---------------------------------------------------------------------------------//
 //admin scrape
 const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
+    var _h;
     if (req.user.role.toLowerCase() != "admin")
         throw new clientError_1.default(403);
     const adminId = req.user._id;
-    const shopName = (_b = req.body.shopName) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+    const shopName = (_h = req.body.shopName) === null || _h === void 0 ? void 0 : _h.toLowerCase();
     if (!shopName)
         throw new clientError_1.default(400, "Shop name is not given");
     const browser = yield puppeteer_1.default.launch({ headless: true });
@@ -135,18 +136,18 @@ const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void
     const discounts = yield page.$$eval(".styles_colMid__3FOth h4", (e) => { return e.map(x => x.textContent); });
     for (const discount of discounts) {
         (0, request_1.default)((0, scrape_1.getOption)(discount), (error, response) => __awaiter(void 0, void 0, void 0, function* () {
-            var _c, _d, _e, _f, _g, _h;
+            var _j, _k, _l, _m, _o, _p;
             if (!error && response) {
                 if (response.body) {
                     let result = JSON.parse(response.body);
                     let detail = result.data.getExternalVoucherBySlug;
                     //coupon detail
-                    let offer = (_c = detail === null || detail === void 0 ? void 0 : detail.offer) !== null && _c !== void 0 ? _c : "No offer";
-                    let expiry = (_d = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _d !== void 0 ? _d : "No expiry date";
-                    let description = (_e = detail === null || detail === void 0 ? void 0 : detail.description.en) !== null && _e !== void 0 ? _e : "No description";
-                    let code = (_f = detail === null || detail === void 0 ? void 0 : detail.code) !== null && _f !== void 0 ? _f : "No code";
-                    let link = (_g = detail === null || detail === void 0 ? void 0 : detail.outbound_url) !== null && _g !== void 0 ? _g : "No link";
-                    let store_name = (_h = detail === null || detail === void 0 ? void 0 : detail.store_name) !== null && _h !== void 0 ? _h : shopName;
+                    let offer = (_j = detail === null || detail === void 0 ? void 0 : detail.offer) !== null && _j !== void 0 ? _j : "No offer";
+                    let expiry = (_k = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _k !== void 0 ? _k : "No expiry date";
+                    let description = (_l = detail === null || detail === void 0 ? void 0 : detail.description.en) !== null && _l !== void 0 ? _l : "No description";
+                    let code = (_m = detail === null || detail === void 0 ? void 0 : detail.code) !== null && _m !== void 0 ? _m : "No code";
+                    let link = (_o = detail === null || detail === void 0 ? void 0 : detail.outbound_url) !== null && _o !== void 0 ? _o : "No link";
+                    let store_name = (_p = detail === null || detail === void 0 ? void 0 : detail.store_name) !== null && _p !== void 0 ? _p : shopName;
                     let coupon = new couponModel_1.Coupon({ discount, offer, expiry, code, link, description, owner: adminId, store_name });
                     yield coupon.save();
                 }

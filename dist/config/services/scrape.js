@@ -52,7 +52,7 @@ const formatDate = (date) => {
     let curr_date = d.getDate();
     let curr_month = d.getMonth() + 1; //Months are zero based
     let curr_year = d.getFullYear();
-    let fullDate = (curr_date + "-" + curr_month + "-" + curr_year);
+    let fullDate = (curr_year + "/" + curr_month + "/" + curr_date);
     if (curr_year < 2005) {
         return null;
     }
