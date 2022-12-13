@@ -55,7 +55,7 @@ const couponSchema = new mongoose_1.Schema({
     },
     description: {
         type: String,
-        minlength: [6, "Description can't be less than 6 characters "]
+        default: "No description for this coupon"
     },
     owner: {
         type: mongoose_1.Schema.Types.ObjectId,

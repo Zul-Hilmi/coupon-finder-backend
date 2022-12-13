@@ -78,9 +78,8 @@ const update = (0, express_async_handler_1.default)((req, res) => __awaiter(void
 }));
 exports.update = update;
 const remove = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const coupon = yield couponModel_1.Coupon.deleteOne({
-        id: req.params.id
-    }).orFail(() => { throw new clientError_1.default(404, "Coupon doesn't exist"); });
+    const coupon = yield couponModel_1.Coupon.findById(req.params.id).orFail(() => { throw new clientError_1.default(404, "Coupon doesn't exist"); });
+    yield couponModel_1.Coupon.deleteOne({ id: req.params.id });
     const ratings = yield ratingModel_1.Rating.deleteMany({ coupon: req.params.id });
     res.status(200).json({ message: "Coupon deleted successfully" });
 }));
@@ -145,7 +144,7 @@ const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void
                     let offer = (_j = detail === null || detail === void 0 ? void 0 : detail.offer) !== null && _j !== void 0 ? _j : "No offer";
                     let expiry = (_k = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _k !== void 0 ? _k : "No expiry date";
                     let description = (_l = detail === null || detail === void 0 ? void 0 : detail.description.en) !== null && _l !== void 0 ? _l : "No description";
-                    let code = (_m = detail === null || detail === void 0 ? void 0 : detail.code) !== null && _m !== void 0 ? _m : "No code";
+                    let code = (_m = detail === null || detail === void 0 ? void 0 : detail.code) !== null && _m !== void 0 ? _m : "No code given";
                     let link = (_o = detail === null || detail === void 0 ? void 0 : detail.outbound_url) !== null && _o !== void 0 ? _o : "No link";
                     let store_name = (_p = detail === null || detail === void 0 ? void 0 : detail.store_name) !== null && _p !== void 0 ? _p : shopName;
                     let coupon = new couponModel_1.Coupon({ discount, offer, expiry, code, link, description, owner: adminId, store_name });
