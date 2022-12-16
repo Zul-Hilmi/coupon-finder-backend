@@ -129,13 +129,7 @@ const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void
     const shopName = (_j = req.body.shopName) === null || _j === void 0 ? void 0 : _j.toLowerCase();
     if (!shopName)
         throw new clientError_1.default(400, "Shop name is not given");
-    const browser = yield puppeteer_1.default.launch({
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ]
-    });
+    const browser = yield puppeteer_1.default.launch({ headless: true });
     const page = yield browser.newPage();
     yield page.goto(`https://www.hargapedia.com.my/vouchers/store/${shopName}`, { timeout: 0 });
     //scrape the element use for sending request
