@@ -141,6 +141,7 @@ const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void
                 if (response.body) {
                     let result = JSON.parse(response.body);
                     let detail = result.data.getExternalVoucherBySlug;
+                    console.log(detail);
                     //coupon detail
                     let offer = (_k = detail === null || detail === void 0 ? void 0 : detail.offer) !== null && _k !== void 0 ? _k : "No offer";
                     let expiry = (_l = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _l !== void 0 ? _l : "No expiry date";

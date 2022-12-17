@@ -37,8 +37,8 @@ exports.getOption = getOption;
 const formatDiscount = (discount) => {
     let formatDis = discount.toLowerCase();
     formatDis = formatDis.replaceAll(/ & /g, " and ");
-    formatDis = formatDis.replaceAll(/"%/g, "percent");
-    formatDis = formatDis.replaceAll(/+/g, "%2B");
+    formatDis = formatDis.replaceAll(/%/g, "percent");
+    formatDis = formatDis.replaceAll(/\+/g, "%2B");
     formatDis = formatDis.trim();
     formatDis = formatDis.replaceAll(/ /g, "-");
     return formatDis;
