@@ -35,7 +35,7 @@ const getOption = (discount) => {
 exports.getOption = getOption;
 //format the scrapped text element for making the request to the scrapping website
 const formatDiscount = (discount) => {
-    let formatDis = discount.toLowerCase();
+    let formatDis = discount.toString().toLowerCase();
     formatDis = formatDis.replaceAll(/ & /g, " and ");
     formatDis = formatDis.replaceAll(/%/g, "percent");
     formatDis = formatDis.replaceAll(/\+/g, "%2B");
