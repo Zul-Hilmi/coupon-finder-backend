@@ -21,6 +21,7 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "nodemailer": "^6.8.0",
+    "pupeteer": "^0.0.1",
     "puppeteer": "^19.4.1",
     "request": "^2.88.2",
     "striptags": "^3.2.0"
