@@ -60,12 +60,8 @@ const detail = (0, express_async_handler_1.default)((req, res) => __awaiter(void
 exports.detail = detail;
 const update = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c, _d, _e, _f, _g, _h;
-    console.log(req.params.id);
-    const coupon = yield couponModel_1.Coupon.findOne({
-        id: req.params.id
-    }).orFail(() => { throw new clientError_1.default(403); });
+    const coupon = yield couponModel_1.Coupon.findById(req.params.id).orFail(() => { throw new clientError_1.default(403); });
     const updatedCoupon = req.body;
-    console.log(updatedCoupon);
     coupon.discount = (_c = updatedCoupon.discount) !== null && _c !== void 0 ? _c : coupon.discount;
     coupon.expiry = (_d = updatedCoupon.expiry) !== null && _d !== void 0 ? _d : coupon.expiry;
     coupon.offer = (_e = updatedCoupon.offer) !== null && _e !== void 0 ? _e : coupon.offer;
@@ -73,7 +69,6 @@ const update = (0, express_async_handler_1.default)((req, res) => __awaiter(void
     coupon.link = (_g = updatedCoupon.link) !== null && _g !== void 0 ? _g : coupon.link;
     coupon.description = (_h = updatedCoupon.description) !== null && _h !== void 0 ? _h : coupon.description;
     coupon.save();
-    console.log(coupon);
     res.status(200).json({ message: "Updated succesfully" });
 }));
 exports.update = update;
@@ -141,7 +136,6 @@ const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void
                 if (response.body) {
                     let result = JSON.parse(response.body);
                     let detail = result.data.getExternalVoucherBySlug;
-                    console.log(detail);
                     //coupon detail
                     let offer = (_k = detail === null || detail === void 0 ? void 0 : detail.offer) !== null && _k !== void 0 ? _k : "No offer";
                     let expiry = (_l = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _l !== void 0 ? _l : "No expiry date";
