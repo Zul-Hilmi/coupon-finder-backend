@@ -35,9 +35,6 @@ const getOption = (discount) => {
 exports.getOption = getOption;
 //format the scrapped text element for making the request to the scrapping website
 const formatDiscount = (discount) => {
-    console.log(discount);
-    if (!discount)
-        return null;
     let formatDis = discount.toString().toLowerCase();
     formatDis = formatDis.replace(/ & /g, " and ");
     formatDis = formatDis.replace(/%/g, "percent");
@@ -55,7 +52,7 @@ const formatDate = (date) => {
     let curr_date = d.getDate();
     let curr_month = d.getMonth() + 1; //Months are zero based
     let curr_year = d.getFullYear();
-    let fullDate = (curr_year + "/" + curr_month + "/" + curr_date);
+    let fullDate = (curr_year + "-" + curr_month + "-" + curr_date);
     if (curr_year < 2005) {
         return null;
     }
@@ -65,9 +62,9 @@ exports.formatDate = formatDate;
 const formatDescription = (description) => {
     if (!description)
         return null;
-    let formdesc = description;
-    formdesc = formdesc.replaceAll("<br>", "&#13");
-    formdesc = formdesc.replaceAll("</li>", "&#13");
+    let formdesc = description.toString();
+    formdesc = formdesc.replace(/<br>/g, "&#13");
+    formdesc = formdesc.replace(/<\/li>/g, "&#13");
     formdesc = (0, striptags_1.default)(formdesc);
     return formdesc;
 };
