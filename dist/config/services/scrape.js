@@ -49,9 +49,13 @@ const formatDate = (date) => {
     if (!date)
         return null;
     const d = new Date(+date);
-    let curr_date = d.getDate();
-    let curr_month = d.getMonth() + 1; //Months are zero based
+    let curr_date = d.getDate().toLocaleString();
+    let curr_month = (d.getMonth() + 1).toString(); //Months are zero based
     let curr_year = d.getFullYear();
+    if (curr_date.length < 2)
+        curr_date = "0" + curr_date;
+    if (curr_month.length < 2)
+        curr_month = "0" + curr_month;
     let fullDate = (curr_year + "-" + curr_month + "-" + curr_date);
     if (curr_year < 2005) {
         return null;
