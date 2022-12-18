@@ -86,10 +86,6 @@ const rate = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0
         throw new clientError_1.default(403, "Only shopper can rate");
     const couponId = req.body.couponId;
     const { comment, like } = req.body;
-    if (!comment || comment.trim().length < 1) {
-        if (!like || like.toLowerCase() != "likes" || like.toLowerCase() != "dislike")
-            throw new clientError_1.default(400, "Comment cannot be empty");
-    }
     const coupon = yield couponModel_1.Coupon.findById(couponId).orFail(() => { throw new clientError_1.default(404, "Coupon doesn't exist"); });
     const rated = yield ratingModel_1.Rating.find({ user: req.user._id, coupon: couponId });
     if (rated)
@@ -138,9 +134,9 @@ const scrape = (0, express_async_handler_1.default)((req, res) => __awaiter(void
                     let detail = result.data.getExternalVoucherBySlug;
                     //coupon detail
                     let offer = (_k = detail === null || detail === void 0 ? void 0 : detail.offer) !== null && _k !== void 0 ? _k : "No offer";
-                    let expiry = (_l = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _l !== void 0 ? _l : "No expiry date";
+                    let expiry = (_l = (0, scrape_1.formatDate)(detail === null || detail === void 0 ? void 0 : detail.expiry)) !== null && _l !== void 0 ? _l : "No expiry";
                     let description = (_m = detail === null || detail === void 0 ? void 0 : detail.description.en) !== null && _m !== void 0 ? _m : "No description";
-                    let code = (_o = detail === null || detail === void 0 ? void 0 : detail.code) !== null && _o !== void 0 ? _o : "No code given";
+                    let code = (_o = detail === null || detail === void 0 ? void 0 : detail.code) !== null && _o !== void 0 ? _o : "No code";
                     let link = (_p = detail === null || detail === void 0 ? void 0 : detail.outbound_url) !== null && _p !== void 0 ? _p : "No link";
                     let store_name = (_q = detail === null || detail === void 0 ? void 0 : detail.store_name) !== null && _q !== void 0 ? _q : shopName;
                     let coupon = new couponModel_1.Coupon({ discount, offer, expiry, code, link, description, owner: adminId, store_name });

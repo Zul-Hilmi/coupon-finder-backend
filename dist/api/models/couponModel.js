@@ -21,11 +21,8 @@ const couponSchema = new mongoose_1.Schema({
         trim: true,
         validate: {
             validator: function (date) {
-                if (!date)
-                    return "No expiry date";
-                const isValidFormat = new RegExp(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/).test(date);
-                if (isValidFormat == false)
-                    return "No expiry date";
+                if (date)
+                    return new RegExp(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/).test(date);
             },
             message: props => `${props.value} is not a valid Date`
         },
@@ -39,23 +36,18 @@ const couponSchema = new mongoose_1.Schema({
     link: {
         type: String,
         trim: true,
+        required: false,
         validate: {
             validator: function (url) {
-                if (!url)
-                    return "No link for this coupon";
-                try {
-                    return new URL(url);
-                }
-                catch (err) {
-                    return "No link for this coupon";
-                }
-            }
+                if (url)
+                    return new URL(url).toString();
+            },
         },
         default: "No link for this coupon"
     },
     description: {
         type: String,
-        default: "No description for this coupon"
+        trim: true
     },
     owner: {
         type: mongoose_1.Schema.Types.ObjectId,
@@ -69,6 +61,18 @@ const couponSchema = new mongoose_1.Schema({
     }
 }, {
     timestamps: true
+});
+couponSchema.pre('save', function (next) {
+    var _a, _b, _c, _d;
+    if (!((_a = this.code) === null || _a === void 0 ? void 0 : _a.trim()))
+        this.code = "No code";
+    if (!((_b = this.expiry) === null || _b === void 0 ? void 0 : _b.trim()))
+        this.expiry = "No expiry";
+    if (!((_c = this.link) === null || _c === void 0 ? void 0 : _c.trim()))
+        this.link = "No link";
+    if (!((_d = this.description) === null || _d === void 0 ? void 0 : _d.trim()))
+        this.description = "No description";
+    next();
 });
 const Coupon = (0, mongoose_1.model)('Coupon', couponSchema);
 exports.Coupon = Coupon;

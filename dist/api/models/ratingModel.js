@@ -7,7 +7,10 @@ const ratingSchema = new mongoose_1.Schema({
         type: String,
         maxlength: [500, "Comments can't be more than 500"],
     },
-    like: Boolean,
+    like: {
+        type: Boolean,
+        required: [true, "You need to give rating"]
+    },
     coupon: {
         type: mongoose_1.Schema.Types.ObjectId,
         required: true,
